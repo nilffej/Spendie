@@ -1,0 +1,93 @@
+{% extends "template.html" %}
+
+{% block body %}
+
+<nav class="navbar navbar-default fixed-top" style="background-color: #202020; padding-left: 50px; padding-right: 50px;">
+    <ul class="navbar-nav">
+        <h3 style="color: white;">Statify</h3>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+        <a href="/logout"><button type="button" class="btn btn-danger">Logout</button></a>
+    </ul>
+</nav>
+
+<div class="container-fluid" style="padding-top: 100px;">
+
+    <div class="row bottom-buffer">
+        <div class="col col-lg-8" style="float: none; margin: 0 auto">
+            <div class="card d-flex flex-row" style="padding: 40px;">
+                <img src="{{ user['pfp'] }}" style="height: 200px; width: 200px;">
+                <div style="padding-left: 20px; display: flex; flex-direction: column; justify-content: space-between; width: 100%">
+                    <h3>{{ user['name'] }}</h3>
+                    <div>
+                    {% for item in user['data'] %}
+                        <div class="row">
+                            <div class="col-3">{{ item[0] }}</div>
+                            <div class="col">{{ item[1] }}</div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                    <a href="{{ user['uri'] }}">Official Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row bottom-buffer">
+        <div class="col col-lg-8" style="float: none; margin: 0 auto">
+            <div class="card d-flex flex-column" style="padding: 40px;">
+                {% if playback['isPlaying'] %}
+                    <h3 style="padding-bottom: 10px;">Currently Playing</h3>
+                {% else %}
+                    <h3 style="padding-bottom: 10px;">Last Played</h3>
+                {% endif %}
+                    <div class="d-flex flex-row">
+                        <a href="{{ playback['maintrack']['uri'] }}"><img src="{{ playback['maintrack']['image'] }}" style="height: 150px; width: 150px;"></a>
+                        <div style="padding-left: 20px; display: flex; flex-direction: column;">
+                            <h4 style="max-width: 400px;">{{ playback['maintrack']['title'] }}</h4>
+                            <p style="padding-top: 10px;">
+                                {{ playback['maintrack']['artists'] }}<br>
+                                {{ playback['maintrack']['album'] }}
+                            </p>
+                        </div>
+                        <div class="ml-auto" style="padding-left: 20px;">
+                            <h6>History</h6>
+                            {% for num in range(5) %}
+                                <a href="{{ playback['recent'][num]['uri'] }}"><img src="{{ playback['recent'][num]['image'] }}" style="height: 60px; width: 60px; margin-right: 5px; margin-bottom: 5px;"></a>
+                            {% endfor %}
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row bottom-buffer">
+        <div class="col col-lg-4" style="float: none; margin-left: auto;">
+            <div class="card" style="padding: 30px; height: 400px;">
+                <h4>Your Top 50 Tracks</h4>
+                <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
+                    <table class="table">
+                        {% for num in range(50) %}
+                        <tr>
+                            <td>{{ num+1 }}</td>
+                            <td><a href="{{ toptracks[num]['uri'] }}"><img src="{{ toptracks[num]['image'] }}" style="height: 40px; width: 40px;"></a></td>
+                            <td>
+                                <h6>{{ toptracks[num]['title'] }}</h6>
+                                <p style="margin-top: -10px;">{{ toptracks[num]['artists'] }}</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col col-lg-4" style="float: none; margin-right: auto">
+            <div class="card" style="padding: 40px; height: 400px;">
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+{% endblock %}

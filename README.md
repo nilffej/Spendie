@@ -1,2 +1,2 @@
-# Spendie
-A Spotify Stats website using Tekore
+# Statify
+A Spotify stats website using Tekore

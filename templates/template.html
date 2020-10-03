@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <title>Document</title>
+    <style>
+        a, a:hover, a:visited{
+            color: #5A5A5A
+        }
+        body {
+            background-color: #1A1A1A;
+            color: white;
+        }
+        p {
+            line-height: 25px;
+        }
+        .bottom-buffer {
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: #202020;
+        }
+        .center-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 100vh;
+        }
+        .table td {
+            border: none;
+            color: white;
+            padding-bottom: 0px;
+        }
+    </style>
+    <body>
+        {% block body %}
+        {% endblock %}
+    </body>
+</html>
