@@ -1,6 +1,5 @@
 import tekore as tk
 
-from tekore.scope import every
 from flask import Flask, request, redirect, session, render_template
 from pprint import pprint
 
@@ -11,8 +10,7 @@ cred = tk.Credentials(*conf)
 spotify = tk.Spotify()
 
 users = {}
-
-app = Flask(__name__)
+auths = {}
 
 def debug(object):
     pprint(type(object))
@@ -27,8 +25,7 @@ def get_user_data():
         'data':[
             ('Followers',user.followers.total),
             ('Country',user.country),
-            ('Email',user.email),
-            ('Account Type',user.product.capitalize())
+            ('Email',user.email)
         ],
         'uri':user.external_urls['spotify']
     }
@@ -49,13 +46,26 @@ def get_playback_data():
         data['recent'].pop(0)
     return data
 
-def get_top_tracks():
+def get_tracks_month():
     data = []
     toptracks = spotify.current_user_top_tracks(time_range='short_term',limit=50)
     for item in toptracks.items:
         data.append(get_track_data(item))
     return data
 
+def get_tracks_year():
+    data = []
+    toptracks = spotify.current_user_top_tracks(time_range='medium_term',limit=50)
+    for item in toptracks.items:
+        data.append(get_track_data(item))
+    return data
+
+def get_tracks_alltime():
+    data = []
+    toptracks = spotify.current_user_top_tracks(time_range='long_term',limit=50)
+    for item in toptracks.items:
+        data.append(get_track_data(item))
+    return data
 
 def get_track_data(track):
     data = {
@@ -74,46 +84,62 @@ def get_artists(item):
     return artistlist[:-2]
 
 def app_factory() -> Flask:
+    app = Flask(__name__)
+    app.debug = True
     app.config['SECRET_KEY'] = 'aliens'
 
     @app.route('/', methods=['GET'])
     def main():
         user = session.get('user', None)
+        token = users.get(user, None)
         page = ''
 
-        if user is not None:
-            token = users[user]
+        if user is None or token is None:
+            session.pop('user', None)
+            return render_template('index.html')
 
-            if token.is_expiring:
-                token = cred.refresh(token)
-                users[user] = token
+        if token.is_expiring:
+            token = cred.refresh(token)
+            users[user] = token
 
-            with spotify.token_as(users[user]):
-                userdata = get_user_data()
-                playbackdata = get_playback_data()
-                toptracksdata = get_top_tracks()
+        with spotify.token_as(users[user]):
+            userdata = get_user_data()
+            playbackdata = get_playback_data()
+            monthtracks = get_tracks_month()
+            yeartracks = get_tracks_year()
+            alltimetracks = get_tracks_alltime()
+            
+            return render_template('homepage.html', user=userdata,
+                        playback=playbackdata, month_tracks=monthtracks,
+                        year_tracks=yeartracks, alltime_tracks=alltimetracks)
 
-                return render_template('homepage.html', user=userdata,
-                            playback=playbackdata, toptracks=toptracksdata)
-
-        return render_template('index.html', page=page)
+        return page
 
     @app.route('/login', methods=['GET'])
     def login():
-        auth_url = cred.user_authorisation_url(scope=every)
-        return redirect(auth_url, 307)
+        if 'user' in session:
+            return redirect('/', 307)
+
+        scope = tk.scope.every
+        auth = tk.UserAuth(cred, scope)
+        auths[auth.state] = auth
+        return redirect(auth.url, 307)
 
     @app.route('/callback', methods=['GET'])
     def login_callback():
         code = request.args.get('code', None)
+        state = request.args.get('state', None)
+        auth = auths.pop(state, None)
 
-        token = cred.request_user_token(code)
-        with spotify.token_as(token):
-            info = spotify.current_user()
+        if auth is None:
+            return 'Invalid state!', 400
 
-        session['user'] = info.id
-        users[info.id] = token
-
+        try:
+            token = auth.request_token(code, state)
+            session['user'] = state
+            users[state] = token
+        except:
+            redirect('/')
         return redirect('/', 307)
 
     @app.route('/logout', methods=['GET'])
@@ -127,6 +153,5 @@ def app_factory() -> Flask:
 
 
 if __name__ == '__main__':
-    app.debug = True
     application = app_factory()
     application.run('127.0.0.1', 5000)

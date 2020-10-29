@@ -1,0 +1,45 @@
+a, a:hover, a:visited{
+    color: #5A5A5A
+}
+body {
+    background-color: #1A1A1A;
+    color: white;
+}
+p {
+    line-height: 25px;
+}
+.bottom-buffer {
+    margin-bottom: 20px;
+}
+.card {
+    background-color: #202020;
+}
+.center-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
+}
+.table td {
+    border: none;
+    color: white;
+    padding-bottom: 0px;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+  
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

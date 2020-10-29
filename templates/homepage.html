@@ -62,18 +62,18 @@
     </div>
     
     <div class="row bottom-buffer">
-        <div class="col col-lg-4" style="float: none; margin-left: auto;">
-            <div class="card" style="padding: 30px; height: 400px;">
-                <h4>Your Top 50 Tracks</h4>
+        <div class="col col-lg-3" style="float: none; margin-left: auto;">
+            <div class="card" style="padding: 30px; height: 600px;">
+                <h4>This Month's Top Tracks</h4>
                 <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
                     <table class="table">
                         {% for num in range(50) %}
                         <tr>
                             <td>{{ num+1 }}</td>
-                            <td><a href="{{ toptracks[num]['uri'] }}"><img src="{{ toptracks[num]['image'] }}" style="height: 40px; width: 40px;"></a></td>
+                            <td><a href="{{ month_tracks[num]['uri'] }}"><img src="{{ month_tracks[num]['image'] }}" style="height: 40px; width: 40px;"></a></td>
                             <td>
-                                <h6>{{ toptracks[num]['title'] }}</h6>
-                                <p style="margin-top: -10px;">{{ toptracks[num]['artists'] }}</p>
+                                <h6>{{ month_tracks[num]['title'] }}</h6>
+                                <p style="margin-top: -10px;">{{ month_tracks[num]['artists'] }}</p>
                             </td>
                         </tr>
                         {% endfor %}
@@ -81,8 +81,42 @@
                 </div>
             </div>
         </div>
-        <div class="col col-lg-4" style="float: none; margin-right: auto">
-            <div class="card" style="padding: 40px; height: 400px;">
+        <div class="col col-lg-3" style="float: none;">
+            <div class="card" style="padding: 40px; height: 600px;">
+                <h4>This Year's Top Tracks</h4>
+                <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
+                    <table class="table">
+                        {% for num in range(50) %}
+                        <tr>
+                            <td>{{ num+1 }}</td>
+                            <td><a href="{{ year_tracks[num]['uri'] }}"><img src="{{ year_tracks[num]['image'] }}" style="height: 40px; width: 40px;"></a></td>
+                            <td>
+                                <h6>{{ year_tracks[num]['title'] }}</h6>
+                                <p style="margin-top: -10px;">{{ year_tracks[num]['artists'] }}</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col col-lg-3" style="float: none; margin-right: auto">
+            <div class="card" style="padding: 40px; height: 600px;">
+                <h4>Top Tracks All Time</h4>
+                <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
+                    <table class="table">
+                        {% for num in range(50) %}
+                        <tr>
+                            <td>{{ num+1 }}</td>
+                            <td><a href="{{ alltime_tracks[num]['uri'] }}"><img src="{{ alltime_tracks[num]['image'] }}" style="height: 40px; width: 40px;"></a></td>
+                            <td>
+                                <h6>{{ alltime_tracks[num]['title'] }}</h6>
+                                <p style="margin-top: -10px;">{{ alltime_tracks[num]['artists'] }}</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
             </div>
         </div>
     </div>
