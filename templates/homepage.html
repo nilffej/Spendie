@@ -1,5 +1,19 @@
 {% extends "template.html" %}
 
+{% block head %} | Your Profile{% endblock %}
+
+{% block script %}
+<script>
+    var month_tracks = {{ month_tracks|tojson }};
+    var year_tracks = {{ year_tracks|tojson }};
+    var alltime_tracks = {{ alltime_tracks|tojson }};
+    var month_artists = {{ month_artists|tojson }};
+    var year_artists = {{ year_artists|tojson }};
+    var alltime_artists = {{ alltime_artists|tojson }};
+    var playback = {{ playback|tojson }};
+</script>
+{% endblock %}
+
 {% block body %}
 
 <nav class="navbar navbar-default fixed-top" style="background-color: #202020; padding-left: 50px; padding-right: 50px;">
@@ -27,7 +41,7 @@
                         </div>
                     {% endfor %}
                     </div>
-                    <a href="{{ user['uri'] }}">Official Profile</a>
+                    <a href="{{ user['url'] }}">Official Profile</a>
                 </div>
             </div>
         </div>
@@ -35,14 +49,14 @@
     
     <div class="row bottom-buffer">
         <div class="col col-lg-8" style="float: none; margin: 0 auto">
-            <div class="card d-flex flex-column" style="padding: 40px;">
-                {% if playback['isPlaying'] %}
-                    <h3 style="padding-bottom: 10px;">Currently Playing</h3>
-                {% else %}
-                    <h3 style="padding-bottom: 10px;">Last Played</h3>
-                {% endif %}
-                    <div class="d-flex flex-row">
-                        <a href="{{ playback['maintrack']['uri'] }}"><img src="{{ playback['maintrack']['image'] }}" style="height: 150px; width: 150px;"></a>
+            <div class="card d-flex flex-column" id="playbackCard" style="padding: 40px;">
+                <h3 id="playStatus" style="padding-bottom: 10px;">
+                {% if playback['isPlaying'] %}Currently Playing
+                {% else %}Last Played{% endif %}
+                </h3>
+                <div class="d-flex flex-row">
+                    <div id="mainTrack" class="d-flex flex-row">
+                        <a href="{{ playback['maintrack']['url'] }}"><img src="{{ playback['maintrack']['image'] }}" style="height: 150px; width: 150px;"></a>
                         <div style="padding-left: 20px; display: flex; flex-direction: column;">
                             <h4 style="max-width: 400px;">{{ playback['maintrack']['title'] }}</h4>
                             <p style="padding-top: 10px;">
@@ -50,27 +64,38 @@
                                 {{ playback['maintrack']['album'] }}
                             </p>
                         </div>
-                        <div class="ml-auto" style="padding-left: 20px;">
-                            <h6>History</h6>
-                            {% for num in range(5) %}
-                                <a href="{{ playback['recent'][num]['uri'] }}"><img src="{{ playback['recent'][num]['image'] }}" style="height: 60px; width: 60px; margin-right: 5px; margin-bottom: 5px;"></a>
-                            {% endfor %}
+                    </div>
+                    <div class="ml-auto" style="padding-left: 20px;">
+                        <h6>History</h6>
+                        <div id="recentTracks">
+                        {% for num in range(5) %}
+                            <a href="{{ playback['recent'][num]['url'] }}"><img src="{{ playback['recent'][num]['image'] }}" style="height: 60px; width: 60px; margin-right: 5px; margin-bottom: 5px;"></a>
+                        {% endfor %}
                         </div>
                     </div>
+                </div>
             </div>
         </div>
     </div>
     
     <div class="row bottom-buffer">
-        <div class="col col-lg-3" style="float: none; margin-left: auto;">
-            <div class="card" style="padding: 30px; height: 600px;">
-                <h4>This Month's Top Tracks</h4>
+
+        <div class="col col-lg-4" style="float: none; margin-left: auto;">
+            <div class="card" style="padding: 0px 30px 30px 30px; height: 600px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <h5 style="display: inline; padding-top: 30px;">Top Tracks</h5>
+                    <div class="tab" id="trackTab" style="display: inline; padding-top: 10px;">
+                        <button class="tablinks active" id="month_tracks" onClick="changeTab(this)">This Month</button>
+                        <button class="tablinks" id="year_tracks" onClick="changeTab(this)">This Year</button>
+                        <button class="tablinks" id="alltime_tracks" onClick="changeTab(this)">All Time</button>
+                    </div>
+                </div>
                 <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
-                    <table class="table">
+                    <table class="table" id="trackTable">
                         {% for num in range(50) %}
                         <tr>
                             <td>{{ num+1 }}</td>
-                            <td><a href="{{ month_tracks[num]['uri'] }}"><img src="{{ month_tracks[num]['image'] }}" style="height: 40px; width: 40px;"></a></td>
+                            <td><a href="{{ month_tracks[num]['url'] }}"><img src="{{ month_tracks[num]['image'] }}" style="height: 40px; width: 40px;"></a></td>
                             <td>
                                 <h6>{{ month_tracks[num]['title'] }}</h6>
                                 <p style="margin-top: -10px;">{{ month_tracks[num]['artists'] }}</p>
@@ -81,18 +106,25 @@
                 </div>
             </div>
         </div>
-        <div class="col col-lg-3" style="float: none;">
-            <div class="card" style="padding: 40px; height: 600px;">
-                <h4>This Year's Top Tracks</h4>
+
+        <div class="col col-lg-4" style="float: none; margin-right: auto;">
+            <div class="card" style="padding: 0px 30px 30px 30px; height: 600px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <h5 style="display: inline; padding-top: 30px;">Top Artists</h5>
+                    <div class="tab" id="artistTab" style="display: inline; padding-top: 10px;">
+                        <button class="tablinks active" id="month_artists" onClick="changeTab(this)">This Month</button>
+                        <button class="tablinks" id="year_artists" onClick="changeTab(this)">This Year</button>
+                        <button class="tablinks" id="alltime_artists" onClick="changeTab(this)">All Time</button>
+                    </div>
+                </div>
                 <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
-                    <table class="table">
-                        {% for num in range(50) %}
+                    <table class="table" id="artistTable">
+                        {% for num in range(month_artists|length) %}
                         <tr>
-                            <td>{{ num+1 }}</td>
-                            <td><a href="{{ year_tracks[num]['uri'] }}"><img src="{{ year_tracks[num]['image'] }}" style="height: 40px; width: 40px;"></a></td>
+                            <td width="40px">{{ num+1 }}</td>
+                            <td width="60px"><a href="{{ month_artists[num]['url'] }}"><img src="{{ month_artists[num]['image'] }}" style="height: 40px; width: 40px;"></a></td>
                             <td>
-                                <h6>{{ year_tracks[num]['title'] }}</h6>
-                                <p style="margin-top: -10px;">{{ year_tracks[num]['artists'] }}</p>
+                                <p>{{ month_artists[num]['name'] }}</p>
                             </td>
                         </tr>
                         {% endfor %}
@@ -100,28 +132,10 @@
                 </div>
             </div>
         </div>
-        <div class="col col-lg-3" style="float: none; margin-right: auto">
-            <div class="card" style="padding: 40px; height: 600px;">
-                <h4>Top Tracks All Time</h4>
-                <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
-                    <table class="table">
-                        {% for num in range(50) %}
-                        <tr>
-                            <td>{{ num+1 }}</td>
-                            <td><a href="{{ alltime_tracks[num]['uri'] }}"><img src="{{ alltime_tracks[num]['image'] }}" style="height: 40px; width: 40px;"></a></td>
-                            <td>
-                                <h6>{{ alltime_tracks[num]['title'] }}</h6>
-                                <p style="margin-top: -10px;">{{ alltime_tracks[num]['artists'] }}</p>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-            </div>
-        </div>
+
     </div>
 
-
+<script src="{{url_for('static', filename='homepage.js')}}"></script>
 </div>
 
 {% endblock %}

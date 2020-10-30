@@ -1,7 +1,8 @@
 import tekore as tk
 
-from flask import Flask, request, redirect, session, render_template
+from flask import Flask, request, redirect, session, render_template, jsonify, make_response
 from pprint import pprint
+import urllib.request, json
 
 from config import *
 
@@ -12,10 +13,7 @@ spotify = tk.Spotify()
 users = {}
 auths = {}
 
-def debug(object):
-    pprint(type(object))
-    pprint(object)
-    return
+
 
 def get_user_data():
     user = spotify.current_user()
@@ -27,7 +25,7 @@ def get_user_data():
             ('Country',user.country),
             ('Email',user.email)
         ],
-        'uri':user.external_urls['spotify']
+        'url':user.external_urls['spotify']
     }
     return data
 
@@ -46,23 +44,13 @@ def get_playback_data():
         data['recent'].pop(0)
     return data
 
-def get_tracks_month():
-    data = []
-    toptracks = spotify.current_user_top_tracks(time_range='short_term',limit=50)
-    for item in toptracks.items:
-        data.append(get_track_data(item))
-    return data
 
-def get_tracks_year():
-    data = []
-    toptracks = spotify.current_user_top_tracks(time_range='medium_term',limit=50)
-    for item in toptracks.items:
-        data.append(get_track_data(item))
-    return data
 
-def get_tracks_alltime():
+# GETTING TOP TRACKS DATA
+
+def get_top_tracks(term):
     data = []
-    toptracks = spotify.current_user_top_tracks(time_range='long_term',limit=50)
+    toptracks = spotify.current_user_top_tracks(time_range=term,limit=50)
     for item in toptracks.items:
         data.append(get_track_data(item))
     return data
@@ -71,22 +59,51 @@ def get_track_data(track):
     data = {
         'image':track.album.images[0].url,
         'title':track.name,
-        'artists':get_artists(track.artists),
+        'artists':get_track_artists(track.artists),
         'album':track.album.name,
-        'uri':track.external_urls['spotify'],
+        'url':track.external_urls['spotify']
     }
     return data
 
-def get_artists(item):
+def get_track_artists(item):
     artistlist = ''
     for artist in item:
         artistlist += artist.name + ', '
     return artistlist[:-2]
 
+
+
+# GETTING TOP ARTISTS DATA
+
+def get_top_artists(term):
+    data = []
+    topartists = spotify.current_user_top_artists(time_range=term,limit=50)
+    for item in topartists.items:
+        data.append(get_artist_data(item))
+    return data
+
+def get_artist_data(artist):
+    data = {
+        'image':artist.images[0].url,
+        'name':artist.name,
+        'type':artist.type,
+        'url':artist.external_urls['spotify']
+    }
+    return data
+
+
+
+# LYRICS SEARCHER
+
+
+
+# MAIN APP
+
 def app_factory() -> Flask:
     app = Flask(__name__)
     app.debug = True
     app.config['SECRET_KEY'] = 'aliens'
+    playbackdata = {}
 
     @app.route('/', methods=['GET'])
     def main():
@@ -105,13 +122,22 @@ def app_factory() -> Flask:
         with spotify.token_as(users[user]):
             userdata = get_user_data()
             playbackdata = get_playback_data()
-            monthtracks = get_tracks_month()
-            yeartracks = get_tracks_year()
-            alltimetracks = get_tracks_alltime()
+
+            monthtracks = get_top_tracks('short_term')
+            yeartracks = get_top_tracks('medium_term')
+            alltimetracks = get_top_tracks('long_term')
+
+            monthartists = get_top_artists('short_term')
+            yearartists = get_top_artists('medium_term')
+            alltimeartists = get_top_artists('long_term')
             
+            print(playbackdata['maintrack'])
+
             return render_template('homepage.html', user=userdata,
                         playback=playbackdata, month_tracks=monthtracks,
-                        year_tracks=yeartracks, alltime_tracks=alltimetracks)
+                        year_tracks=yeartracks, alltime_tracks=alltimetracks,
+                        month_artists=monthartists, year_artists=yearartists,
+                        alltime_artists=alltimeartists)
 
         return page
 
@@ -120,7 +146,7 @@ def app_factory() -> Flask:
         if 'user' in session:
             return redirect('/', 307)
 
-        scope = tk.scope.every
+        scope = tk.scope.read
         auth = tk.UserAuth(cred, scope)
         auths[auth.state] = auth
         return redirect(auth.url, 307)
@@ -148,6 +174,13 @@ def app_factory() -> Flask:
         if uid is not None:
             users.pop(uid, None)
         return redirect('/', 307)
+
+    @app.route('/updatePlayback', methods=['POST'])
+    def updatePlaybackData():
+        user = session.get('user', None)
+        with spotify.token_as(users[user]):
+            data = get_playback_data()
+            return make_response(jsonify(data), 200)
 
     return app
 
