@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import soupsieve
 import requests
 
 def search_lyrics(song, artist):
@@ -13,7 +14,7 @@ def search_lyrics(song, artist):
     s = song + ' ' + artist
     searchquery = '+'.join(s.split())
 
-    searchurl = requests.get(f'https://search.azlyrics.com/search.php?q={searchquery}').text
+    searchurl = requests.get('https://search.azlyrics.com/search.php?q={}'.format(searchquery)).text
     results = BeautifulSoup(searchurl, 'lxml')
     # print(f'https://search.azlyrics.com/search.php?q={searchquery}')
 
