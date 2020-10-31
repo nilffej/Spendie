@@ -4,6 +4,7 @@ from flask import Flask, request, redirect, session, render_template, jsonify, m
 from pprint import pprint
 import urllib.request, json
 
+from lyricscraper import search_lyrics
 from config import *
 
 conf = (CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
@@ -130,8 +131,6 @@ def app_factory() -> Flask:
             monthartists = get_top_artists('short_term')
             yearartists = get_top_artists('medium_term')
             alltimeartists = get_top_artists('long_term')
-            
-            print(playbackdata['maintrack'])
 
             return render_template('homepage.html', user=userdata,
                         playback=playbackdata, month_tracks=monthtracks,
@@ -180,7 +179,17 @@ def app_factory() -> Flask:
         user = session.get('user', None)
         with spotify.token_as(users[user]):
             data = get_playback_data()
+            print(data['maintrack']['title'])
             return make_response(jsonify(data), 200)
+
+    @app.route('/loadLyrics', methods=['POST'])
+    def lyric_search():
+        req = request.get_json()
+        print(req)
+        lyrics = search_lyrics(req['title'],req['artists'])
+        return make_response(jsonify(lyrics), 200)
+
+
 
     return app
 

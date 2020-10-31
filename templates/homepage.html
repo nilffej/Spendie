@@ -56,7 +56,7 @@
                 </h3>
                 <div class="d-flex flex-row">
                     <div id="mainTrack" class="d-flex flex-row">
-                        <a href="{{ playback['maintrack']['url'] }}"><img src="{{ playback['maintrack']['image'] }}" style="height: 150px; width: 150px;"></a>
+                        <a href="{{ playback['maintrack']['url'] }}"><img src="{{ playback['maintrack']['image'] }}" style="height: 250px; width: 250px;"></a>
                         <div style="padding-left: 20px; display: flex; flex-direction: column;">
                             <h4 style="max-width: 400px;">{{ playback['maintrack']['title'] }}</h4>
                             <p style="padding-top: 10px;">
@@ -69,7 +69,7 @@
                         <h6>History</h6>
                         <div id="recentTracks">
                         {% for num in range(5) %}
-                            <a href="{{ playback['recent'][num]['url'] }}"><img src="{{ playback['recent'][num]['image'] }}" style="height: 60px; width: 60px; margin-right: 5px; margin-bottom: 5px;"></a>
+                            <a href="{{ playback['recent'][num]['url'] }}"><img src="{{ playback['recent'][num]['image'] }}" style="height: 80px; width: 80px; margin-right: 5px; margin-bottom: 5px;"></a>
                         {% endfor %}
                         </div>
                     </div>
@@ -77,7 +77,23 @@
             </div>
         </div>
     </div>
-    
+
+    <div class="row bottom-buffer">
+        <div class="col col-lg-8" style="float: none; margin: 0 auto">
+            <div class="card text-center" style="padding: 0px 30px 0px 30px;">
+                <div class="card-body">
+                    <button id="lyricsButton" style="padding: 10px; height: 20px; width: 500px;" onclick="loadLyrics()">
+                        Find Lyrics for {{ playback['maintrack']['title'] }}
+                    </button>
+                    <div>
+                        <div class="overflow-auto" id="lyrics" style="max-height: 400px; background-color: #2b2b2b"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="row bottom-buffer">
 
         <div class="col col-lg-4" style="float: none; margin-left: auto;">
@@ -85,9 +101,9 @@
                 <div style="display: flex; justify-content: space-between;">
                     <h5 style="display: inline; padding-top: 30px;">Top Tracks</h5>
                     <div class="tab" id="trackTab" style="display: inline; padding-top: 10px;">
-                        <button class="tablinks active" id="month_tracks" onClick="changeTab(this)">This Month</button>
-                        <button class="tablinks" id="year_tracks" onClick="changeTab(this)">This Year</button>
-                        <button class="tablinks" id="alltime_tracks" onClick="changeTab(this)">All Time</button>
+                        <button class="tablinks active" id="month_tracks" onclick="changeTab(this)">This Month</button>
+                        <button class="tablinks" id="year_tracks" onclick="changeTab(this)">This Year</button>
+                        <button class="tablinks" id="alltime_tracks" onclick="changeTab(this)">All Time</button>
                     </div>
                 </div>
                 <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
@@ -95,7 +111,7 @@
                         {% for num in range(50) %}
                         <tr>
                             <td>{{ num+1 }}</td>
-                            <td><a href="{{ month_tracks[num]['url'] }}"><img src="{{ month_tracks[num]['image'] }}" style="height: 40px; width: 40px;"></a></td>
+                            <td><a href="{{ month_tracks[num]['url'] }}"><img src="{{ month_tracks[num]['image'] }}" style="height: 60px; width: 60px;"></a></td>
                             <td>
                                 <h6>{{ month_tracks[num]['title'] }}</h6>
                                 <p style="margin-top: -10px;">{{ month_tracks[num]['artists'] }}</p>
@@ -112,9 +128,9 @@
                 <div style="display: flex; justify-content: space-between;">
                     <h5 style="display: inline; padding-top: 30px;">Top Artists</h5>
                     <div class="tab" id="artistTab" style="display: inline; padding-top: 10px;">
-                        <button class="tablinks active" id="month_artists" onClick="changeTab(this)">This Month</button>
-                        <button class="tablinks" id="year_artists" onClick="changeTab(this)">This Year</button>
-                        <button class="tablinks" id="alltime_artists" onClick="changeTab(this)">All Time</button>
+                        <button class="tablinks active" id="month_artists" onclick="changeTab(this)">This Month</button>
+                        <button class="tablinks" id="year_artists" onclick="changeTab(this)">This Year</button>
+                        <button class="tablinks" id="alltime_artists" onclick="changeTab(this)">All Time</button>
                     </div>
                 </div>
                 <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
@@ -122,7 +138,7 @@
                         {% for num in range(month_artists|length) %}
                         <tr>
                             <td width="40px">{{ num+1 }}</td>
-                            <td width="60px"><a href="{{ month_artists[num]['url'] }}"><img src="{{ month_artists[num]['image'] }}" style="height: 40px; width: 40px;"></a></td>
+                            <td width="60px"><a href="{{ month_artists[num]['url'] }}"><img src="{{ month_artists[num]['image'] }}" style="height: 60px; width: 60px;"></a></td>
                             <td>
                                 <p>{{ month_artists[num]['name'] }}</p>
                             </td>
