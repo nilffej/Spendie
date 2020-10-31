@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv='cache-control' content='no-cache'>
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <!-- <meta http-equiv='cache-control' content='no-cache'> -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <title>Statify{% block head %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -14,4 +15,10 @@
         {% block body %}
         {% endblock %}
     </body>
+
+    {% block footer %}
+    <div class="footer-copyright text-center py-3" style="color: gray;">
+        built by jeff lin
+    </div>
+    {% endblock %}
 </html>

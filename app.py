@@ -94,15 +94,11 @@ def get_artist_data(artist):
 
 
 
-# LYRICS SEARCHER
-
-
-
 # MAIN APP
 
 def app_factory() -> Flask:
     app = Flask(__name__)
-    app.debug = True
+    # app.debug = True
     app.config['SECRET_KEY'] = 'aliens'
     playbackdata = {}
 
@@ -179,17 +175,13 @@ def app_factory() -> Flask:
         user = session.get('user', None)
         with spotify.token_as(users[user]):
             data = get_playback_data()
-            print(data['maintrack']['title'])
             return make_response(jsonify(data), 200)
 
     @app.route('/loadLyrics', methods=['POST'])
     def lyric_search():
         req = request.get_json()
-        print(req)
         lyrics = search_lyrics(req['title'],req['artists'])
         return make_response(jsonify(lyrics), 200)
-
-
 
     return app
 

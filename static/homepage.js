@@ -16,7 +16,7 @@ function updatePlaybackData() {
             }
             response.json().then(function (data) {
                 pbcard = document.getElementById("playbackCard");
-                if (data["isPlaying"]) document.getElementById("playStatus").innerHTML = "Currenlty Playing";
+                if (data["isPlaying"]) document.getElementById("playStatus").innerHTML = "Currently Playing";
                 else { document.getElementById("playStatus").innerHTML = "Last Played"; }
                 if (data["maintrack"]["title"] != playback["maintrack"]["title"]) {
                     playback["maintrack"] = data["maintrack"];
@@ -54,6 +54,8 @@ function updatePlaybackData() {
 }
 
 function loadLyrics() {
+    lyrbutt = document.getElementById("lyricsButton");
+    lyrbutt.innerHTML = 'Loading...';
     fetch(`${window.origin}/loadLyrics`, {
         method: "POST",
         credentials: "include",
@@ -71,14 +73,18 @@ function loadLyrics() {
                 console.log(`Error: ${response.status}`);
                 return;
             }
-            console.log(response)
             response.json().then(function (data) {
-                lyrbutt = document.getElementById("lyricsButton")
+                lyrbutt = document.getElementById("lyricsButton");
                 lyrbutt.innerHTML = 'Close Lyrics';
                 lyrbutt.setAttribute("onClick", "closeLyrics()");
                 lyrics = document.getElementById("lyrics");
                 lyrics.parentElement.style["padding-top"] = "10px";
-                lyrics.innerHTML = data;
+                lyrics.innerHTML = data['lyrics'];
+                if (data['source']) lyrics.innerHTML += `
+                <div style="padding-top: 20px">
+                    <a href="${data['source']}">Source - AZLyrics</div>
+                </div>
+                `
                 lyrics.style["padding"] = "10px";
             });
         });
