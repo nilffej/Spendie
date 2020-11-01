@@ -46,14 +46,12 @@ def get_user_data():
 
 def get_playback_data():
     with spotify.token_as(tokencheck()):
-        # logger("POST: " + spotify.current_user().display_name + " " + session['user'])
         data = { 'isPlaying': False }
         recenttracks = []
         for item in spotify.playback_recently_played(limit=6).items:
             recenttracks.append(get_track_data(item.track))
         if not len(recenttracks):
             data['maintrack'] = False
-            return data
         data['recent'] = recenttracks
         current = spotify.playback_currently_playing()
         if current:
@@ -128,7 +126,7 @@ def tokencheck():
 
 @app.route('/', methods=['GET'])
 def main():
-    pprint(session)
+    print(session)
     user = session.get('user', None)
     token = users.get(user, None)
     page = ''
@@ -142,7 +140,9 @@ def main():
         users[user] = token
 
     with spotify.token_as(users[user]):
-        # logger(spotify.current_user().display_name + " " + str(users[user]))
+        print("LOGIN: " + spotify.current_user().display_name)
+        print(session)
+        pprint(users.keys())
 
         userdata = get_user_data()
         playbackdata = get_playback_data()
@@ -155,7 +155,6 @@ def main():
         yearartists = get_top_artists('medium_term')
         alltimeartists = get_top_artists('long_term')
 
-        pprint(users.keys())
 
         return render_template('homepage.html', user=userdata,
                     playback=playbackdata, month_tracks=monthtracks,
@@ -202,14 +201,22 @@ def logout():
 
 @app.route('/updatePlayback', methods=['POST'])
 def updatePlaybackData():
+    data = {}
+    user = session.get('user', None)
     try:
-        user = session.get('user', None)
         with spotify.token_as(users[user]):
-            data = get_playback_data()
-            pprint("reached")
-            return make_response(jsonify(data), 200)
+            try:
+                    data = get_playback_data()
+                    return make_response(jsonify(data), 200)
+            except:
+                print("ERROR REACHED: " + spotify.current_user().display_name)
+                print(session)
+                pprint(data)
+                return(jsonify({}), 400)
     except:
+        print("REFRESH REQUIRED: " + user)
         return(jsonify({}), 400)
+
 
 @app.route('/loadLyrics', methods=['POST'])
 def lyric_search():

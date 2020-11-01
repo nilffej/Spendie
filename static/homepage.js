@@ -1,4 +1,5 @@
 var interval = setInterval(updatePlaybackData, 5000);
+var errorcounter = 0;
 
 function updatePlaybackData() {
     fetch(`${window.origin}/updatePlayback`, {
@@ -11,8 +12,11 @@ function updatePlaybackData() {
     })
         .then(function (response) {
             if (response.status != 200) {
-                clearInterval(interval);
-                console.log(`ERROR: ${response.status}`);
+                errorcounter += 1;
+                if (errorcounter == 45) {
+                    clearInterval(interval);
+                    console.log('THREE MINUTES OF ERRORS - REFRESH')
+                }
                 return;
             }
             response.json().then(function (data) {
@@ -51,6 +55,7 @@ function updatePlaybackData() {
                     `
                     }
                 }
+                errorcounter = 0;
             });
         })
 }
