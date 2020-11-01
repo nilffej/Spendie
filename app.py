@@ -6,6 +6,8 @@ from pprint import pprint
 from lyricscraper import search_lyrics
 from config import *
 
+from datetime import datetime
+
 conf = (CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
 cred = tk.Credentials(*conf)
 spotify = tk.Spotify()
@@ -18,10 +20,14 @@ app.config['SECRET_KEY'] = 'chicken'
 playbackdata = {}
 
 
+def logger(s):
+    time = datetime.now().strftime("%H:%M:%S")
+    with open("log.txt","a") as f:
+        f.write("[" + time + "] " + s + '\n')
+
 
 def get_user_data():
     user = spotify.current_user()
-    pfp = None
     if not len(user.images):
         pfp = "https://vignette.wikia.nocookie.net/caramella-girls/images/9/99/Blankpfp.png/revision/latest?cb=20190122015011"
     else:
@@ -39,8 +45,8 @@ def get_user_data():
     return data
 
 def get_playback_data():
-    user = session.get('user', None)
-    with spotify.token_as(users[user]):
+    with spotify.token_as(tokencheck()):
+        logger("POST: " + spotify.current_user().display_name + " " + session['user'])
         data = { 'isPlaying': False }
         recenttracks = []
         for item in spotify.playback_recently_played(limit=6).items:
@@ -50,6 +56,7 @@ def get_playback_data():
         if current:
             data['isPlaying'] = True
             data['maintrack'] = get_track_data(current.item)
+
         else:
             data['maintrack'] = data['recent'][0]
             data['recent'].pop(0)
@@ -102,16 +109,16 @@ def get_artist_data(artist):
     }
     return data
 
-
-# def tokencheck():
-#     user = session.get('user', None)
-#     token = users.get(user, None)
-#     if user is None or token is None:
-#         session.pop('user', None)
-#         return render_template('index.html')
-#     if token.is_expiring:
-#         token = cred.refresh(token)
-#         users[user] = token
+def tokencheck():
+    user = session.get('user', None)
+    token = users.get(user, None)
+    if user is None or token is None:
+        session.pop('user', None)
+        return render_template('index.html')
+    if token.is_expiring:
+        token = cred.refresh(token)
+        users[user] = token
+    return token
 
 
 
@@ -133,6 +140,8 @@ def main():
         users[user] = token
 
     with spotify.token_as(users[user]):
+        logger(spotify.current_user().display_name + " " + str(users[user]))
+
         userdata = get_user_data()
         playbackdata = get_playback_data()
 
@@ -160,7 +169,7 @@ def login():
         return redirect('/', 307)
 
     scope = tk.scope.read
-    auth = tk.UserAuth(cred, scope)
+    auth = tk.UserAuth(cred, scope=scope)
     auths[auth.state] = auth
     return redirect(auth.url, 307)
 

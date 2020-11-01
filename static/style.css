@@ -25,6 +25,9 @@ p {
     text-align: center;
     min-height: 100vh;
 }
+.col-lg-8 {
+    min-width: 1000px;
+}
 .table td {
     border: none;
     color: white;

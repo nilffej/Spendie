@@ -27,7 +27,7 @@
 
 <div class="container-fluid" style="padding-top: 100px;">
     <div class="row bottom-buffer">
-        <div class="col-lg-8" style="float: none; margin: 0 auto">
+        <div class="col-xl-8" style="float: none; margin: 0 auto">
             <div class="card d-flex flex-row" style="padding: 40px;">
                 <img src="{{ user['pfp'] }}" style="height: 200px; width: 200px;">
                 <div style="padding-left: 20px; display: flex; flex-direction: column; justify-content: space-between; width: 100%">
@@ -47,10 +47,10 @@
     </div>
     
     <div class="row bottom-buffer">
-        <div class="col-lg-8" style="float: none; margin: 0 auto">
+        <div class="col-xl-8" style="float: none; margin: 0 auto">
             <div class="card d-flex flex-column" id="playbackCard" style="padding: 40px;">
                 <div class="row">
-                    <div class="col-lg-7">
+                    <div class="col-xl-7">
                         <h3 id="playStatus" style="padding-bottom: 10px;">
                         {% if playback['isPlaying'] %}Currently Playing
                         {% else %}Last Played{% endif %}
@@ -66,11 +66,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-5">
+                    <div class="col-xl-5">
                         <div class="ml-auto" style="padding: 20px 0px 0px 0px;">
                             <h6>History</h6>
                             <div id="recentTracks">
-                            {% for num in range(playback['recent']|length) %}
+                            {% set recentlength = range(5) %}
+                            {% if playback['recent']|length < 5 %}
+                                {% set recentlength = range(playback['recent']|length) %}
+                            {% endif %}
+                            {% for num in recentlength %}
                                 <a href="{{ playback['recent'][num]['url'] }}"><img src="{{ playback['recent'][num]['image'] }}" style="height: 80px; width: 80px; margin-right: 5px; margin-bottom: 5px;"></a>
                             {% endfor %}
                             </div>
@@ -82,7 +86,7 @@
     </div>
 
     <div class="row bottom-buffer">
-        <div class="col-lg-8" style="float: none; margin: 0 auto;">
+        <div class="col-xl-8" style="float: none; margin: 0 auto;">
             <div class="card text-center" style="padding: 0 auto;">
                 <div class="card-body">
                     <button id="lyricsButton" style="padding: 10px; height: 20px; width: 500px;" onclick="loadLyrics()">
@@ -99,7 +103,7 @@
 
     <div class="row bottom-buffer">
 
-        <div class="col-lg-4 padtop" style="float: none; margin-left: auto;">
+        <div class="col-xl-4 padtop" style="float: none; margin-left: auto;">
             <div class="card" style="padding: 0px 30px 30px 30px; height: 600px;">
                 <div style="display: flex; justify-content: space-between;">
                     <h5 style="display: inline; padding-top: 30px;">Top Tracks</h5>
@@ -109,7 +113,7 @@
                         <button class="tablinks" id="alltime_tracks" onclick="changeTab(this)">All Time</button>
                     </div>
                 </div>
-                <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
+                <div class="overflow-auto" style="margin: 0px -10px -10px -10px; padding-top: 30px;">
                     <table class="table" id="trackTable">
                         {% for num in range(month_tracks|length) %}
                         <tr>
@@ -126,7 +130,7 @@
             </div>
         </div>
 
-        <div class="col-lg-4 padtop" style="float: none; margin-right: auto;">
+        <div class="col-xl-4 padtop" style="float: none; margin-right: auto;">
             <div class="card" style="padding: 0px 30px 30px 30px; height: 600px;">
                 <div style="display: flex; justify-content: space-between;">
                     <h5 style="display: inline; padding-top: 30px;">Top Artists</h5>
@@ -136,7 +140,7 @@
                         <button class="tablinks" id="alltime_artists" onclick="changeTab(this)">All Time</button>
                     </div>
                 </div>
-                <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
+                <div class="overflow-auto" style="margin: 0px -10px -10px -10px; padding-top: 30px;">
                     <table class="table" id="artistTable">
                         {% for num in range(month_artists|length) %}
                         <tr>
