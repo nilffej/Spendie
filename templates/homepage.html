@@ -70,7 +70,7 @@
                         <div class="ml-auto" style="padding: 20px 0px 0px 0px;">
                             <h6>History</h6>
                             <div id="recentTracks">
-                            {% for num in range(5) %}
+                            {% for num in range(playback['recent']|length) %}
                                 <a href="{{ playback['recent'][num]['url'] }}"><img src="{{ playback['recent'][num]['image'] }}" style="height: 80px; width: 80px; margin-right: 5px; margin-bottom: 5px;"></a>
                             {% endfor %}
                             </div>
@@ -111,7 +111,7 @@
                 </div>
                 <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
                     <table class="table" id="trackTable">
-                        {% for num in range(50) %}
+                        {% for num in range(month_tracks|length) %}
                         <tr>
                             <td>{{ num+1 }}</td>
                             <td><a href="{{ month_tracks[num]['url'] }}"><img src="{{ month_tracks[num]['image'] }}" style="height: 60px; width: 60px;"></a></td>

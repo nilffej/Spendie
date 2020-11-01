@@ -1,6 +1,7 @@
 import tekore as tk
 
 from flask import Flask, request, redirect, session, render_template, jsonify, make_response
+from pprint import pprint
 
 from lyricscraper import search_lyrics
 from config import *
@@ -20,8 +21,13 @@ playbackdata = {}
 
 def get_user_data():
     user = spotify.current_user()
+    pfp = None
+    if not len(user.images):
+        pfp = "https://vignette.wikia.nocookie.net/caramella-girls/images/9/99/Blankpfp.png/revision/latest?cb=20190122015011"
+    else:
+        pfp = user.images[0].url
     data = {
-        'pfp':user.images[0].url,
+        'pfp':pfp,
         'name':user.display_name,
         'data':[
             ('Followers',user.followers.total),
@@ -33,19 +39,21 @@ def get_user_data():
     return data
 
 def get_playback_data():
-    data = { 'isPlaying': False }
-    recenttracks = []
-    for item in spotify.playback_recently_played(limit=6).items:
-        recenttracks.append(get_track_data(item.track))
-    data['recent'] = recenttracks
-    current = spotify.playback_currently_playing()
-    if current:
-        data['isPlaying'] = True
-        data['maintrack'] = get_track_data(current.item)
-    else:
-        data['maintrack'] = data['recent'][0]
-        data['recent'].pop(0)
-    return data
+    user = session.get('user', None)
+    with spotify.token_as(users[user]):
+        data = { 'isPlaying': False }
+        recenttracks = []
+        for item in spotify.playback_recently_played(limit=6).items:
+            recenttracks.append(get_track_data(item.track))
+        data['recent'] = recenttracks
+        current = spotify.playback_currently_playing()
+        if current:
+            data['isPlaying'] = True
+            data['maintrack'] = get_track_data(current.item)
+        else:
+            data['maintrack'] = data['recent'][0]
+            data['recent'].pop(0)
+        return data
 
 
 
@@ -95,11 +103,23 @@ def get_artist_data(artist):
     return data
 
 
+# def tokencheck():
+#     user = session.get('user', None)
+#     token = users.get(user, None)
+#     if user is None or token is None:
+#         session.pop('user', None)
+#         return render_template('index.html')
+#     if token.is_expiring:
+#         token = cred.refresh(token)
+#         users[user] = token
+
+
 
 # MAIN APP
 
 @app.route('/', methods=['GET'])
 def main():
+    pprint(session)
     user = session.get('user', None)
     token = users.get(user, None)
     page = ''
@@ -123,6 +143,8 @@ def main():
         monthartists = get_top_artists('short_term')
         yearartists = get_top_artists('medium_term')
         alltimeartists = get_top_artists('long_term')
+
+        pprint(users.keys())
 
         return render_template('homepage.html', user=userdata,
                     playback=playbackdata, month_tracks=monthtracks,
@@ -161,6 +183,7 @@ def login_callback():
 
 @app.route('/logout', methods=['GET'])
 def logout():
+    pprint(users.keys())
     uid = session.pop('user', None)
     if uid is not None:
         users.pop(uid, None)
@@ -182,4 +205,4 @@ def lyric_search():
 
 if __name__ == '__main__':
     app.debug = True
-    app.run()
+    app.run(threaded=True)
