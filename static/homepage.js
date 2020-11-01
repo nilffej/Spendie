@@ -11,7 +11,8 @@ function updatePlaybackData() {
     })
         .then(function (response) {
             if (response.status != 200) {
-                console.log(`Error: ${response.status}`);
+                clearInterval(interval);
+                console.log(`ERROR: ${response.status}`);
                 return;
             }
             response.json().then(function (data) {

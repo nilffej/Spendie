@@ -200,10 +200,14 @@ def logout():
 
 @app.route('/updatePlayback', methods=['POST'])
 def updatePlaybackData():
-    user = session.get('user', None)
-    with spotify.token_as(users[user]):
-        data = get_playback_data()
-        return make_response(jsonify(data), 200)
+    try:
+        user = session.get('user', None)
+        with spotify.token_as(users[user]):
+            data = get_playback_data()
+            pprint("reached")
+            return make_response(jsonify(data), 200)
+    except:
+        return(jsonify({}), 400)
 
 @app.route('/loadLyrics', methods=['POST'])
 def lyric_search():
@@ -213,5 +217,5 @@ def lyric_search():
 
 
 if __name__ == '__main__':
-    # app.debug = True
+    app.debug = True
     app.run(threaded=True)

@@ -140,7 +140,7 @@
                         <button class="tablinks" id="alltime_artists" onclick="changeTab(this)">All Time</button>
                     </div>
                 </div>
-                <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
+                <div style="margin: 0px -10px -10px -10px; -webkit-overflow-y: auto; overflow-y: auto;">
                     <table class="table" id="artistTable">
                         {% for num in range(month_artists|length) %}
                         <tr>
