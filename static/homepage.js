@@ -17,6 +17,7 @@ function updatePlaybackData() {
             }
             response.json().then(function (data) {
                 pbcard = document.getElementById("playbackCard");
+                if (!data["maintrack"]) return;
                 if (data["isPlaying"]) document.getElementById("playStatus").innerHTML = "Currently Playing";
                 else { document.getElementById("playStatus").innerHTML = "Last Played"; }
                 if (data["maintrack"]["title"] != playback["maintrack"]["title"]) {

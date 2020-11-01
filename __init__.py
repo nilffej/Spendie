@@ -51,12 +51,14 @@ def get_playback_data():
         recenttracks = []
         for item in spotify.playback_recently_played(limit=6).items:
             recenttracks.append(get_track_data(item.track))
+        if not len(recenttracks):
+            data['maintrack'] = False
+            return data
         data['recent'] = recenttracks
         current = spotify.playback_currently_playing()
         if current:
             data['isPlaying'] = True
             data['maintrack'] = get_track_data(current.item)
-
         else:
             data['maintrack'] = data['recent'][0]
             data['recent'].pop(0)

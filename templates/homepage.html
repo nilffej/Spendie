@@ -56,6 +56,7 @@
                         {% else %}Last Played{% endif %}
                         </h3>
                         <div id="mainTrack" class="d-flex flex-row">
+                            {% if playback['maintrack'] != false %}
                             <a href="{{ playback['maintrack']['url'] }}"><img src="{{ playback['maintrack']['image'] }}" style="height: 250px; width: 250px;"></a>
                             <div class="d-flex flex-column" style="padding-left: 20px;">
                                 <h4 style="max-width: 400px;">{{ playback['maintrack']['title'] }}</h4>
@@ -64,6 +65,7 @@
                                     {{ playback['maintrack']['album'] }}
                                 </p>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="col-xl-5">
@@ -102,7 +104,7 @@
 
 
     <div class="row bottom-buffer">
-        
+
         <div class="col-xl-4 padtop" style="float: none; margin-left: auto;">
             <div class="card" style="padding: 0px 30px 30px 30px; height: 600px;">
                 <div class="card-body" style="margin: -20px;">
@@ -135,7 +137,7 @@
         </div>
 
         <div class="col-xl-4 padtop" style="float: none; margin-right: auto;">
-            <div class="card" style="padding: 0px 30px 30px 30px;">
+            <div class="card" style="padding: 0px 30px 30px 30px; height: 600px">
                 <div class="card-body" style="margin: -20px;">
                     <div style="display: flex; justify-content: space-between;">
                         <h5 style="display: inline; padding-top: 30px;">Top Artists</h5>
