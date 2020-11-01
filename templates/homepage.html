@@ -106,14 +106,14 @@
         <div class="col-xl-4 padtop" style="float: none; margin-left: auto;">
             <div class="card" style="padding: 0px 30px 30px 30px; height: 600px;">
                 <div style="display: flex; justify-content: space-between;">
-                    <h5 style="display: inline; padding-top: 30px;">Top Tracks</h5>
+                    <h5 style="display: inline block; padding-top: 30px;">Top Tracks</h5>
                     <div class="tab" id="trackTab" style="display: inline; padding-top: 10px;">
                         <button class="tablinks active" id="month_tracks" onclick="changeTab(this)">This Month</button>
                         <button class="tablinks" id="year_tracks" onclick="changeTab(this)">This Year</button>
                         <button class="tablinks" id="alltime_tracks" onclick="changeTab(this)">All Time</button>
                     </div>
                 </div>
-                <div class="overflow-auto" style="margin: 0px -10px -10px -10px; padding-top: 30px;">
+                <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
                     <table class="table" id="trackTable">
                         {% for num in range(month_tracks|length) %}
                         <tr>
@@ -133,14 +133,14 @@
         <div class="col-xl-4 padtop" style="float: none; margin-right: auto;">
             <div class="card" style="padding: 0px 30px 30px 30px; height: 600px;">
                 <div style="display: flex; justify-content: space-between;">
-                    <h5 style="display: inline; padding-top: 30px;">Top Artists</h5>
+                    <h5 style="display: inline block; padding-top: 30px;">Top Artists</h5>
                     <div class="tab" id="artistTab" style="display: inline; padding-top: 10px;">
                         <button class="tablinks active" id="month_artists" onclick="changeTab(this)">This Month</button>
                         <button class="tablinks" id="year_artists" onclick="changeTab(this)">This Year</button>
                         <button class="tablinks" id="alltime_artists" onclick="changeTab(this)">All Time</button>
                     </div>
                 </div>
-                <div class="overflow-auto" style="margin: 0px -10px -10px -10px; padding-top: 30px;">
+                <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
                     <table class="table" id="artistTable">
                         {% for num in range(month_artists|length) %}
                         <tr>
