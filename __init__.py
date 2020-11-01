@@ -46,7 +46,7 @@ def get_user_data():
 
 def get_playback_data():
     with spotify.token_as(tokencheck()):
-        logger("POST: " + spotify.current_user().display_name + " " + session['user'])
+        # logger("POST: " + spotify.current_user().display_name + " " + session['user'])
         data = { 'isPlaying': False }
         recenttracks = []
         for item in spotify.playback_recently_played(limit=6).items:
@@ -140,7 +140,7 @@ def main():
         users[user] = token
 
     with spotify.token_as(users[user]):
-        logger(spotify.current_user().display_name + " " + str(users[user]))
+        # logger(spotify.current_user().display_name + " " + str(users[user]))
 
         userdata = get_user_data()
         playbackdata = get_playback_data()

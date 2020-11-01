@@ -106,52 +106,56 @@
         <div class="col-xl-4 padtop" style="float: none; margin-left: auto;">
             <div class="card" style="padding: 0px 30px 30px 30px; height: 600px;">
                 <div style="display: flex; justify-content: space-between;">
-                    <h5 style="display: inline block; padding-top: 30px;">Top Tracks</h5>
+                    <h5 style="display: inline; padding-top: 30px;">Top Tracks</h5>
                     <div class="tab" id="trackTab" style="display: inline; padding-top: 10px;">
                         <button class="tablinks active" id="month_tracks" onclick="changeTab(this)">This Month</button>
                         <button class="tablinks" id="year_tracks" onclick="changeTab(this)">This Year</button>
                         <button class="tablinks" id="alltime_tracks" onclick="changeTab(this)">All Time</button>
                     </div>
                 </div>
-                <div class="overflow-auto" style="margin: 0px -10px -10px -10px;">
-                    <table class="table" id="trackTable">
-                        {% for num in range(month_tracks|length) %}
-                        <tr>
-                            <td>{{ num+1 }}</td>
-                            <td><a href="{{ month_tracks[num]['url'] }}"><img src="{{ month_tracks[num]['image'] }}" style="height: 60px; width: 60px;"></a></td>
-                            <td>
-                                <h6>{{ month_tracks[num]['title'] }}</h6>
-                                <p style="margin-top: -10px;">{{ month_tracks[num]['artists'] }}</p>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                </div>
+                <div style="overflow-y: auto; overflow-x: hidden; margin-top: 10px;">
+                    <div style="margin: 5px;">
+                        <table class="table" id="trackTable">
+                            {% for num in range(month_tracks|length) %}
+                            <tr>
+                                <td>{{ num+1 }}</td>
+                                <td><a href="{{ month_tracks[num]['url'] }}"><img src="{{ month_tracks[num]['image'] }}" style="height: 60px; width: 60px;"></a></td>
+                                <td>
+                                    <h6>{{ month_tracks[num]['title'] }}</h6>
+                                    <p style="margin-top: -10px;">{{ month_tracks[num]['artists'] }}</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    </div>
             </div>
         </div>
 
         <div class="col-xl-4 padtop" style="float: none; margin-right: auto;">
             <div class="card" style="padding: 0px 30px 30px 30px; height: 600px;">
                 <div style="display: flex; justify-content: space-between;">
-                    <h5 style="display: inline block; padding-top: 30px;">Top Artists</h5>
+                    <h5 style="display: inline; padding-top: 30px;">Top Artists</h5>
                     <div class="tab" id="artistTab" style="display: inline; padding-top: 10px;">
                         <button class="tablinks active" id="month_artists" onclick="changeTab(this)">This Month</button>
                         <button class="tablinks" id="year_artists" onclick="changeTab(this)">This Year</button>
                         <button class="tablinks" id="alltime_artists" onclick="changeTab(this)">All Time</button>
                     </div>
                 </div>
-                <div style="margin: 0px -10px -10px -10px; -webkit-overflow-y: auto; overflow-y: auto;">
-                    <table class="table" id="artistTable">
-                        {% for num in range(month_artists|length) %}
-                        <tr>
-                            <td width="40px">{{ num+1 }}</td>
-                            <td width="60px"><a href="{{ month_artists[num]['url'] }}"><img src="{{ month_artists[num]['image'] }}" style="height: 60px; width: 60px;"></a></td>
-                            <td>
-                                <p>{{ month_artists[num]['name'] }}</p>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </table>
+                <div style="overflow-y: auto; overflow-x: hidden; margin-top: 10px;">
+                    <div style="margin: 5px;">
+                        <table class="table" id="artistTable">
+                            {% for num in range(month_artists|length) %}
+                            <tr>
+                                <td width="40px">{{ num+1 }}</td>
+                                <td width="60px"><a href="{{ month_artists[num]['url'] }}"><img src="{{ month_artists[num]['image'] }}" style="height: 60px; width: 60px;"></a></td>
+                                <td>
+                                    <p>{{ month_artists[num]['name'] }}</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
