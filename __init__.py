@@ -136,45 +136,51 @@ def tokencheck():
 
 # MAIN APP
 
+# @app.route('/error')
+# def error():
+#     return render_template('error.html')
+
 @app.route('/', methods=['GET'])
 def main():
-    print(session)
-    user = session.get('user', None)
-    token = users.get(user, None)
-    page = ''
-
-    if user is None or token is None:
-        session.pop('user', None)
-        return render_template('index.html')
-
-    if token.is_expiring:
-        token = cred.refresh(token)
-        users[user] = token
-
-    with spotify.token_as(users[user]):
-        print("LOGIN: " + spotify.current_user().display_name)
+    try:
         print(session)
-        pprint(users.keys())
+        user = session.get('user', None)
+        token = users.get(user, None)
+        page = ''
 
-        userdata = get_user_data()
-        playbackdata = get_playback_data(users[user])
+        if user is None or token is None:
+            session.pop('user', None)
+            return render_template('index.html')
 
-        monthtracks = get_top_tracks('short_term')
-        yeartracks = get_top_tracks('medium_term')
-        alltimetracks = get_top_tracks('long_term')
+        if token.is_expiring:
+            token = cred.refresh(token)
+            users[user] = token
 
-        monthartists = get_top_artists('short_term')
-        yearartists = get_top_artists('medium_term')
-        alltimeartists = get_top_artists('long_term')
+        with spotify.token_as(users[user]):
+            print("LOGIN: " + spotify.current_user().display_name)
+            print(session)
+            pprint(users.keys())
+
+            userdata = get_user_data()
+            playbackdata = get_playback_data(users[user])
+
+            monthtracks = get_top_tracks('short_term')
+            yeartracks = get_top_tracks('medium_term')
+            alltimetracks = get_top_tracks('long_term')
+
+            monthartists = get_top_artists('short_term')
+            yearartists = get_top_artists('medium_term')
+            alltimeartists = get_top_artists('long_term')
 
 
-        return render_template('homepage.html', user=userdata,
-                    playback=playbackdata, month_tracks=monthtracks,
-                    year_tracks=yeartracks, alltime_tracks=alltimetracks,
-                    month_artists=monthartists, year_artists=yearartists,
-                    alltime_artists=alltimeartists, sessionid=session['user'])
-
-    return page
+            return render_template('homepage.html', user=userdata,
+                        playback=playbackdata, month_tracks=monthtracks,
+                        year_tracks=yeartracks, alltime_tracks=alltimetracks,
+                        month_artists=monthartists, year_artists=yearartists,
+                        alltime_artists=alltimeartists, sessionid=session['user'])
+        return page
+    except:
+        return render_template('error.html')
 
 @app.route('/login', methods=['GET'])
 def login():
