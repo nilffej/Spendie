@@ -1,6 +1,3 @@
-var interval = setInterval(updatePlaybackData, 5000);
-var errorcounter = 0;
-
 function updatePlaybackData() {
     fetch(`${window.origin}/updatePlayback`, {
         method: "POST",
@@ -13,17 +10,17 @@ function updatePlaybackData() {
         .then(function (response) {
             if (response.status != 200) {
                 errorcounter += 1;
-                if (errorcounter == 45) {
+                if (errorcounter >= 45) {
                     clearInterval(interval);
-                    console.log('THREE MINUTES OF ERRORS - REFRESH')
+                    console.log('NUMEROUS ERRORS - REFRESH')
                 }
                 return;
             }
             response.json().then(function (data) {
-                pbcard = document.getElementById("playbackCard");
                 if (!data["maintrack"]) return;
                 if (data["isPlaying"]) document.getElementById("playStatus").innerHTML = "Currently Playing";
                 else { document.getElementById("playStatus").innerHTML = "Last Played"; }
+
                 if (data["maintrack"]["title"] != playback["maintrack"]["title"]) {
                     playback["maintrack"] = data["maintrack"];
                     document.getElementById("mainTrack").innerHTML = `
@@ -157,3 +154,6 @@ function changeArtistTabContent(obj_id) {
         `;
     }
 }
+
+var interval = setInterval(updatePlaybackData, 3000);
+var errorcounter = 0;

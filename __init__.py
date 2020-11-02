@@ -44,22 +44,26 @@ def get_user_data():
     }
     return data
 
-def get_playback_data():
-    with spotify.token_as(tokencheck()):
+def get_playback_data(token):
+    tempspotify = tk.Spotify()
+    with tempspotify.token_as(token):
         data = { 'isPlaying': False }
         recenttracks = []
-        for item in spotify.playback_recently_played(limit=6).items:
+        for item in tempspotify.playback_recently_played(limit=6).items:
             recenttracks.append(get_track_data(item.track))
         if not len(recenttracks):
             data['maintrack'] = False
         data['recent'] = recenttracks
-        current = spotify.playback_currently_playing()
+        current = tempspotify.playback_currently_playing()
         if current:
             data['isPlaying'] = True
             data['maintrack'] = get_track_data(current.item)
         else:
             data['maintrack'] = data['recent'][0]
             data['recent'].pop(0)
+        print(session['user'] + ' ' + data['maintrack']['title'])
+        print('\n')
+        data['sessionID'] = session['user']
         return data
 
 
@@ -74,8 +78,12 @@ def get_top_tracks(term):
     return data
 
 def get_track_data(track):
+    if not len(track.album.images):
+        pfp = "https://vignette.wikia.nocookie.net/caramella-girls/images/9/99/Blankpfp.png/revision/latest?cb=20190122015011"
+    else:
+        pfp = track.album.images[0].url
     data = {
-        'image':track.album.images[0].url,
+        'image':pfp,
         'title':track.name,
         'artists':get_track_artists(track.artists),
         'album':track.album.name,
@@ -101,10 +109,13 @@ def get_top_artists(term):
     return data
 
 def get_artist_data(artist):
+    if not len(artist.images):
+        pfp = "https://vignette.wikia.nocookie.net/caramella-girls/images/9/99/Blankpfp.png/revision/latest?cb=20190122015011"
+    else:
+        pfp = artist.images[0].url
     data = {
-        'image':artist.images[0].url,
+        'image':pfp,
         'name':artist.name,
-        'type':artist.type,
         'url':artist.external_urls['spotify']
     }
     return data
@@ -118,6 +129,7 @@ def tokencheck():
     if token.is_expiring:
         token = cred.refresh(token)
         users[user] = token
+    print('TOKEN RETRIEVED FOR: ' + user) 
     return token
 
 
@@ -145,7 +157,7 @@ def main():
         pprint(users.keys())
 
         userdata = get_user_data()
-        playbackdata = get_playback_data()
+        playbackdata = get_playback_data(users[user])
 
         monthtracks = get_top_tracks('short_term')
         yeartracks = get_top_tracks('medium_term')
@@ -160,7 +172,7 @@ def main():
                     playback=playbackdata, month_tracks=monthtracks,
                     year_tracks=yeartracks, alltime_tracks=alltimetracks,
                     month_artists=monthartists, year_artists=yearartists,
-                    alltime_artists=alltimeartists)
+                    alltime_artists=alltimeartists, sessionid=session['user'])
 
     return page
 
@@ -204,14 +216,16 @@ def updatePlaybackData():
     data = {}
     user = session.get('user', None)
     try:
-        with spotify.token_as(users[user]):
+        token = tokencheck()
+        with spotify.token_as(token):
+            print(spotify.current_user().display_name + ' ' + session['user'])
             try:
-                    data = get_playback_data()
+                    data = get_playback_data(token)
+                    data['userid'] = session['user']
                     return make_response(jsonify(data), 200)
             except:
                 print("ERROR REACHED: " + spotify.current_user().display_name)
                 print(session)
-                pprint(data)
                 return(jsonify({}), 400)
     except:
         print("REFRESH REQUIRED: " + user)
@@ -226,5 +240,5 @@ def lyric_search():
 
 
 if __name__ == '__main__':
-    app.debug = True
+    # app.debug = True
     app.run(threaded=True)
