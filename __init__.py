@@ -6,8 +6,6 @@ from pprint import pprint
 from lyricscraper import search_lyrics
 from config import *
 
-from datetime import datetime
-
 conf = (CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
 cred = tk.Credentials(*conf)
 spotify = tk.Spotify()
@@ -19,11 +17,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chicken'
 playbackdata = {}
 
-
-def logger(s):
-    time = datetime.now().strftime("%H:%M:%S")
-    with open("log.txt","a") as f:
-        f.write("[" + time + "] " + s + '\n')
 
 
 def get_user_data():
