@@ -55,15 +55,14 @@ def get_playback_data(token):
             data['maintrack'] = False
         data['recent'] = recenttracks
         current = tempspotify.playback_currently_playing()
-        if current:
-            data['isPlaying'] = True
+        if current and current.currently_playing_type == 'track':
             data['maintrack'] = get_track_data(current.item)
+            data['isPlaying'] = True
         else:
             data['maintrack'] = data['recent'][0]
             data['recent'].pop(0)
-        print(session['user'] + ' ' + data['maintrack']['title'])
-        print('\n')
-        data['sessionID'] = session['user']
+        print(tempspotify.current_user().display_name + ": " + data['maintrack']['title'] + " - " + data['maintrack']['artists'])
+        # print('\n')
         return data
 
 
@@ -120,67 +119,66 @@ def get_artist_data(artist):
     }
     return data
 
-def tokencheck():
-    user = session.get('user', None)
-    token = users.get(user, None)
-    if user is None or token is None:
+def tokencheck(sessionid):
+    token = users.get(sessionid, None)
+    if token is None:
         session.pop('user', None)
         return render_template('index.html')
     if token.is_expiring:
         token = cred.refresh(token)
-        users[user] = token
-    print('TOKEN RETRIEVED FOR: ' + user) 
+        users[sessionid] = token
+    # print('TOKEN RETRIEVED FOR: ' + user) 
     return token
 
 
 
 # MAIN APP
 
-# @app.route('/error')
-# def error():
-#     return render_template('error.html')
+@app.route('/error')
+def error():
+    return render_template('error.html')
 
 @app.route('/', methods=['GET'])
 def main():
-    try:
+    # try:
+    print(session)
+    user = session.get('user', None)
+    token = users.get(user, None)
+    page = ''
+
+    if user is None or token is None:
+        session.pop('user', None)
+        return render_template('index.html')
+
+    if token.is_expiring:
+        token = cred.refresh(token)
+        users[user] = token
+
+    with spotify.token_as(users[user]):
+        print("LOGIN: " + spotify.current_user().display_name)
         print(session)
-        user = session.get('user', None)
-        token = users.get(user, None)
-        page = ''
+        pprint(users.keys())
 
-        if user is None or token is None:
-            session.pop('user', None)
-            return render_template('index.html')
+        userdata = get_user_data()
+        playbackdata = get_playback_data(users[user])
 
-        if token.is_expiring:
-            token = cred.refresh(token)
-            users[user] = token
+        monthtracks = get_top_tracks('short_term')
+        yeartracks = get_top_tracks('medium_term')
+        alltimetracks = get_top_tracks('long_term')
 
-        with spotify.token_as(users[user]):
-            print("LOGIN: " + spotify.current_user().display_name)
-            print(session)
-            pprint(users.keys())
-
-            userdata = get_user_data()
-            playbackdata = get_playback_data(users[user])
-
-            monthtracks = get_top_tracks('short_term')
-            yeartracks = get_top_tracks('medium_term')
-            alltimetracks = get_top_tracks('long_term')
-
-            monthartists = get_top_artists('short_term')
-            yearartists = get_top_artists('medium_term')
-            alltimeartists = get_top_artists('long_term')
+        monthartists = get_top_artists('short_term')
+        yearartists = get_top_artists('medium_term')
+        alltimeartists = get_top_artists('long_term')
 
 
-            return render_template('homepage.html', user=userdata,
-                        playback=playbackdata, month_tracks=monthtracks,
-                        year_tracks=yeartracks, alltime_tracks=alltimetracks,
-                        month_artists=monthartists, year_artists=yearartists,
-                        alltime_artists=alltimeartists, sessionid=session['user'])
-        return page
-    except:
-        return render_template('error.html')
+        return render_template('homepage.html', user=userdata,
+                    playback=playbackdata, month_tracks=monthtracks,
+                    year_tracks=yeartracks, alltime_tracks=alltimetracks,
+                    month_artists=monthartists, year_artists=yearartists,
+                    alltime_artists=alltimeartists, sessionid=session['user'])
+    return page
+    # except:
+    #     return render_template('error.html')
 
 @app.route('/login', methods=['GET'])
 def login():
@@ -217,24 +215,23 @@ def logout():
         users.pop(uid, None)
     return redirect('/', 307)
 
-@app.route('/updatePlayback', methods=['POST'])
-def updatePlaybackData():
+@app.route('/updatePlayback/<sessionid>', methods=['POST'])
+def updatePlaybackData(sessionid):
     data = {}
-    user = session.get('user', None)
+    # print(sessionid)
     try:
-        token = tokencheck()
+        token = tokencheck(sessionid)
         with spotify.token_as(token):
-            print(spotify.current_user().display_name + ' ' + session['user'])
+            # print(spotify.current_user().display_name + ' ' + session['user'])
             try:
                     data = get_playback_data(token)
-                    data['userid'] = session['user']
                     return make_response(jsonify(data), 200)
             except:
                 print("ERROR REACHED: " + spotify.current_user().display_name)
                 print(session)
                 return(jsonify({}), 400)
     except:
-        print("REFRESH REQUIRED: " + user)
+        print("REFRESH REQUIRED: " + sessionid)
         return(jsonify({}), 400)
 
 
@@ -246,5 +243,5 @@ def lyric_search():
 
 
 if __name__ == '__main__':
-    # app.debug = True
+    app.debug = True
     app.run(threaded=True)

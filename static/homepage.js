@@ -1,5 +1,5 @@
 function updatePlaybackData() {
-    fetch(`${window.origin}/updatePlayback`, {
+    fetch(`${window.origin}/updatePlayback/${sessionid}`, {
         method: "POST",
         credentials: "include",
         cache: "no-cache",
@@ -155,5 +155,8 @@ function changeArtistTabContent(obj_id) {
     }
 }
 
-var interval = setInterval(updatePlaybackData, 3000);
+var interval;
+document.addEventListener('DOMContentLoaded', function() {
+    interval = setInterval(updatePlaybackData, 5000);
+}, false);
 var errorcounter = 0;
